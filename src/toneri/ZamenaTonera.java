@@ -21,9 +21,9 @@ import javax.swing.JOptionPane;
  * @author Milos Jelic
  */
 public class ZamenaTonera extends javax.swing.JFrame {
-   String sDB = "jdbc:derby://localhost:1527/toneridb";
-   String sUser = "User1";
-   String sPassword = "test";
+   String sDB = "jdbc:mysql://localhost:3306/toneridb";
+   String sUser = "root";
+   String sPassword = "";
    String LinkTo = "";
     private String stampac_toner;
     private Integer kolicina;
@@ -428,7 +428,7 @@ public class ZamenaTonera extends javax.swing.JFrame {
   
                  
                if(printer_id.length() > 0){
-                String query = "SELECT * FROM User1.PRINTERS WHERE PRINTID = ?";
+                String query = "SELECT * FROM PRINTERS WHERE PRINTID = ?";
                 Connection con = DriverManager.getConnection(sDB, sUser, sPassword);
                 PreparedStatement pstmt = con.prepareStatement(query); 
                 pstmt.setString(1,printer_id);
@@ -441,7 +441,7 @@ public class ZamenaTonera extends javax.swing.JFrame {
                     Zamena_stampacid.setText(stampac_id);
                     Zamena_stampac.setText(stampac_marka + " " + stampac_model);
                     
-                   String query2 = "SELECT * FROM User1.TONERI WHERE TONER_NAZIV = ?";
+                   String query2 = "SELECT * FROM TONERI WHERE TONER_NAZIV = ?";
                    PreparedStatement pstmt2 = con.prepareStatement(query2);
                    pstmt2.setString(1,stampac_toner);
                    java.sql.ResultSet rs2 = pstmt2.executeQuery();
@@ -505,8 +505,8 @@ public class ZamenaTonera extends javax.swing.JFrame {
             
             
             try{
-                Connection Con = DriverManager.getConnection("jdbc:derby://localhost:1527/toneridb","User1","test");
-                String Query = "Update User1.TONERI set TONER_KOLICINA="+kolicina+""+" where TONER_NAZIV='"+Zamena_toner.getText()+"'";
+                Connection Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/toneridb","root","");
+                String Query = "Update TONERI set TONER_KOLICINA="+kolicina+""+" where TONER_NAZIV='"+Zamena_toner.getText()+"'";
                 Statement Add = Con.createStatement();
                 Add.executeUpdate(Query);
                 
@@ -514,7 +514,7 @@ public class ZamenaTonera extends javax.swing.JFrame {
                 
                 SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd");
                 Date date = new Date(System.currentTimeMillis());
-                String query2 = "Update User1.PRINTERS set POSLEDNJA_PROMENA='"+formatter.format(date)+"'"+"where PRINTID="+Zamena_stampacid.getText()+"";
+                String query2 = "Update PRINTERS set POSLEDNJA_PROMENA='"+formatter.format(date)+"'"+"where PRINTID="+Zamena_stampacid.getText()+"";
                 Statement Add2 = Con.createStatement();
                 Add2.executeUpdate(query2);
                 
@@ -547,8 +547,8 @@ public class ZamenaTonera extends javax.swing.JFrame {
             
             
             try{
-                Connection Con = DriverManager.getConnection("jdbc:derby://localhost:1527/toneridb","User1","test");
-                String Query = "Update User1.TONERI set TONER_KOLICINA="+kolicina+""+" where TONER_NAZIV='"+Zamena_toner.getText()+"'";
+                Connection Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/toneridb","root","");
+                String Query = "Update TONERI set TONER_KOLICINA="+kolicina+""+" where TONER_NAZIV='"+Zamena_toner.getText()+"'";
                 Statement Add = Con.createStatement();
                 Add.executeUpdate(Query);
              
@@ -557,7 +557,7 @@ public class ZamenaTonera extends javax.swing.JFrame {
                 
                 SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd");
                 Date date = new Date(System.currentTimeMillis());
-                String query2 = "Update User1.PRINTERS set POSLEDNJA_PROMENA='"+formatter.format(date)+"'"+"where PRINTID="+Zamena_stampacid.getText()+"";
+                String query2 = "Update PRINTERS set POSLEDNJA_PROMENA='"+formatter.format(date)+"'"+"where PRINTID="+Zamena_stampacid.getText()+"";
                 Statement Add2 = Con.createStatement();
                 Add2.executeUpdate(query2);
                 
@@ -597,8 +597,8 @@ public class ZamenaTonera extends javax.swing.JFrame {
                 int respone = JOptionPane.showConfirmDialog(this,"Da li želite da dodate"+" " + kolicina_vise2 +" " +"tonera?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
               if(respone == JOptionPane.YES_OPTION){
             try{
-                Connection Con = DriverManager.getConnection("jdbc:derby://localhost:1527/toneridb","User1","test");
-                String Query = "Update User1.TONERI set TONER_KOLICINA="+kolicina+""+" where TONER_NAZIV='"+Zamena_toner.getText()+"'";
+                Connection Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/toneridb","root","");
+                String Query = "Update TONERI set TONER_KOLICINA="+kolicina+""+" where TONER_NAZIV='"+Zamena_toner.getText()+"'";
                 Statement Add = Con.createStatement();
                 Add.executeUpdate(Query);
                 
@@ -606,7 +606,7 @@ public class ZamenaTonera extends javax.swing.JFrame {
                 
                 SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd");
                 Date date = new Date(System.currentTimeMillis());
-                String query2 = "Update User1.PRINTERS set POSLEDNJA_PROMENA='"+formatter.format(date)+"'"+" where PRINTID="+Zamena_stampacid.getText()+"";
+                String query2 = "Update PRINTERS set POSLEDNJA_PROMENA='"+formatter.format(date)+"'"+" where PRINTID="+Zamena_stampacid.getText()+"";
                 Statement Add2 = Con.createStatement();
                 Add2.executeUpdate(query2);
                 System.out.println(query2);

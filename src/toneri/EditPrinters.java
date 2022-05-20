@@ -34,9 +34,9 @@ public class EditPrinters extends javax.swing.JFrame {
     public void SelectToner()
     {
         try{
-        Con = DriverManager.getConnection("jdbc:derby://localhost:1527/toneridb","User1","test");
+        Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/toneridb","root","");
         St = Con.createStatement();
-        Rs = St.executeQuery("Select * from User1.PRINTERS ");
+        Rs = St.executeQuery("Select * from PRINTERS ");
         Toner_table.setModel(DbUtils.resultSetToTableModel(Rs));
         
         
@@ -227,7 +227,7 @@ public class EditPrinters extends javax.swing.JFrame {
         jLabel10.setFont(new java.awt.Font("Open Sans", 0, 11)); // NOI18N
         jLabel10.setText("Inventarski broj");
 
-        ID_Toner.setEditable(false);
+        ID_Toner.setEditable(true);
         ID_Toner.setFont(new java.awt.Font("Open Sans", 0, 11)); // NOI18N
 
         jLabel16.setFont(new java.awt.Font("Open Sans", 0, 11)); // NOI18N
@@ -586,14 +586,14 @@ public class EditPrinters extends javax.swing.JFrame {
     }//GEN-LAST:event_AddBtnActionPerformed
 
     private void AddBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_AddBtnMouseClicked
-        if( Toner_marka.getText().isEmpty() || Toner_toner.getText().isEmpty() || Toner_model.getText().isEmpty() || ID_Toner.getText().isEmpty() || Toner_invbroj.getText().isEmpty()){
+        if( Toner_marka.getText().isEmpty() || Toner_toner.getText().isEmpty() || Toner_model.getText().isEmpty() ||  Toner_invbroj.getText().isEmpty()){
             JOptionPane.showMessageDialog(this, "Popunite sva polja!");
             
         }
         else{
         try {
                      
-            Con = DriverManager.getConnection("jdbc:derby://localhost:1527/toneridb","User1","test");
+            Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/toneridb","root","");
             PreparedStatement add = Con.prepareStatement("insert into PRINTERS values (?,?,?,?,?,?,?,?,?,?,?,?,?)");
             add.setInt(1, Integer.valueOf(ID_Toner.getText()));
             add.setString(2, Toner_ipaddress.getText());
@@ -667,9 +667,9 @@ public class EditPrinters extends javax.swing.JFrame {
            
            if(respone == JOptionPane.YES_OPTION){
            try{
-             Con = DriverManager.getConnection("jdbc:derby://localhost:1527/toneridb","User1","test");
+             Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/toneridb","root","");
              String TId = ID_Toner.getText();
-             String Query = "Delete from User1.PRINTERS where PRINTID="+TId;
+             String Query = "Delete from PRINTERS where PRINTID="+TId;
              Statement Add = Con.createStatement();
              Add.executeUpdate(Query);
              SelectToner();
@@ -694,8 +694,8 @@ public class EditPrinters extends javax.swing.JFrame {
 else
         {
             try{
-                Con = DriverManager.getConnection("jdbc:derby://localhost:1527/toneridb","User1","test");
-                String Query = "Update User1.PRINTERS set IP_ADDRESS='"+Toner_ipaddress.getText()+"'"+",MODEL='"+Toner_model.getText()+"'"+",LOKACIJA='"+Toner_lokacija.getText()+"'"+",MARKA='"+Toner_marka.getText()+"'"+",STATUS='"+Toner_status.getText()+"'"+",TIP='"+Toner_tip.getSelectedItem().toString()+"'"+",SLIKA='"+Toner_slika.getText()+"'"+",POSLEDNJI_SERVIS='"+Toner_poslednjiservis.getText()+"'"+",INV_BROJ='"+Toner_invbroj.getText()+"'"+",TONER='"+Toner_toner.getText()+"'"+",DRIVER='"+Toner_driver.getText()+"'"+",POSLEDNJA_PROMENA='"+Toner_poslednjaprom.getText()+"'"+" where PRINTID="+ID_Toner.getText();
+                Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/toneridb","root","");
+                String Query = "Update PRINTERS set IP_ADDRESS='"+Toner_ipaddress.getText()+"'"+",MODEL='"+Toner_model.getText()+"'"+",LOKACIJA='"+Toner_lokacija.getText()+"'"+",MARKA='"+Toner_marka.getText()+"'"+",STATUS='"+Toner_status.getText()+"'"+",TIP='"+Toner_tip.getSelectedItem().toString()+"'"+",SLIKA='"+Toner_slika.getText()+"'"+",POSLEDNJI_SERVIS='"+Toner_poslednjiservis.getText()+"'"+",INV_BROJ='"+Toner_invbroj.getText()+"'"+",TONER='"+Toner_toner.getText()+"'"+",DRIVER='"+Toner_driver.getText()+"'"+",POSLEDNJA_PROMENA='"+Toner_poslednjaprom.getText()+"'"+" where PRINTID="+ID_Toner.getText();
                 Statement Add = Con.createStatement();
                 Add.executeUpdate(Query);
                 SelectToner();

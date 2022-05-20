@@ -21,9 +21,9 @@ import javax.swing.JOptionPane;
  * @author Milos Jelic
  */
 public class Stampaci extends javax.swing.JFrame {
-   String sDB = "jdbc:derby://localhost:1527/toneridb";
-   String sUser = "User1";
-   String sPassword = "test";
+   String sDB = "jdbc:mysql://localhost:3306/toneridb";
+   String sUser = "root";
+   String sPassword = "";
    String LinkTo = "";
     private String stampac_toner;
 
@@ -545,7 +545,7 @@ public class Stampaci extends javax.swing.JFrame {
                     Printer_status.setText("");    
                  
                if(printer_id.length() > 0){
-                String query = "SELECT * FROM User1.PRINTERS WHERE PRINTID = ?";
+                String query = "SELECT * FROM PRINTERS WHERE PRINTID = ?";
                 Connection con = DriverManager.getConnection(sDB, sUser, sPassword);
                 PreparedStatement pstmt = con.prepareStatement(query); 
                 pstmt.setString(1,printer_id);
@@ -585,7 +585,7 @@ public class Stampaci extends javax.swing.JFrame {
                     Printer_lokacija.setText(stampac_lokacija);
                     Printer_status.setText(stampac_status);
                     
-                   String query2 = "SELECT * FROM User1.TONERI WHERE TONER_NAZIV = ?";
+                   String query2 = "SELECT * FROM TONERI WHERE TONER_NAZIV = ?";
                    PreparedStatement pstmt2 = con.prepareStatement(query2);
                    pstmt2.setString(1,stampac_toner);
                    java.sql.ResultSet rs2 = pstmt2.executeQuery();

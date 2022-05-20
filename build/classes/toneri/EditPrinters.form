@@ -784,7 +784,7 @@
             <Component class="javax.swing.JTextField" name="ID_Toner">
               <Properties>
                 <Property name="editable" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="false" type="code"/>
+                  <Connection code="true" type="code"/>
                 </Property>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Open Sans" size="11" style="0"/>

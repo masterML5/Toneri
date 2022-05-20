@@ -15,9 +15,9 @@ import javax.swing.JOptionPane;
  * @author Milos Jelic
  */
 public class Login extends javax.swing.JFrame {
-   String sDB = "jdbc:derby://localhost:1527/toneridb";
-   String sUser = "User1";
-   String sPassword = "test";
+   String sDB = "jdbc:mysql://localhost:3306/toneridb";
+   String sUser = "root";
+   String sPassword = "";
     String usern;
     /**
      * Creates new form Login
@@ -224,7 +224,7 @@ public class Login extends javax.swing.JFrame {
             userText = usernameField.getText();
             pwdText = passwordField.getText();
              try{
-            String query = "SELECT * FROM User1.USERTABLE WHERE USERNAME = ?";
+            String query = "SELECT * FROM USERTABLE WHERE USERNAME = ?";
              Connection con = DriverManager.getConnection(sDB, sUser, sPassword);
              PreparedStatement pstmt = con.prepareStatement(query); 
              pstmt.setString(1,userText);
