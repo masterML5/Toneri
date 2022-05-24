@@ -244,7 +244,7 @@ public class Login extends javax.swing.JFrame {
        
              }
                   else{
-                    JOptionPane.showMessageDialog(null, "Stampac nema svoj toner, unesite toner za stampac", "a", JOptionPane.ERROR_MESSAGE);                   
+                    JOptionPane.showMessageDialog(null, "Pogresno korisnicko ime ili lozinka!", "a", JOptionPane.ERROR_MESSAGE);                   
                     usernameField.setText("");
                     passwordField.setText("");
                 }

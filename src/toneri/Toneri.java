@@ -5,6 +5,10 @@
  */
 package toneri;
 
+import java.awt.BorderLayout;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+
 /**
  *
  * @author Milos Jelic
@@ -15,7 +19,11 @@ public class Toneri {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-       new Splash().setVisible(true);
+      SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+            new Splash().setVisible(true);
+        }
+    });
       
     }
     

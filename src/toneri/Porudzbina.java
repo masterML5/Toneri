@@ -5,21 +5,87 @@
  */
 package toneri;
 
+import java.awt.Desktop;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.sql.Connection;
+import java.util.Date;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import javax.swing.JOptionPane;
-
+import javax.swing.JTable;
+import net.proteanit.sql.DbUtils;
+import org.omg.CORBA.Object;
+import javax.swing.JFileChooser;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 /**
  *
  * @author Milos Jelic
  */
 public class Porudzbina extends javax.swing.JFrame {
-
+    
     /**
      * Creates new form Porudžbina
      */
+    private StringSelection stsel;
+    private Clipboard clipboard;
     public Porudzbina() {
         initComponents();
+        SelectPorudzbina();
+        
     }
+    Connection Con = null;
+    Statement St = null;
+    ResultSet Rs = null;
+    ResultSet RsTable = null;
+    
+ 
+    
+    public void SelectPorudzbina()
+    {
+        try{
+        Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/toneridb","root","");
+        St = Con.createStatement();
+        RsTable = St.executeQuery("Select Printers.MARKA as 'Marka', Printers.MODEL as 'Model', Toneri.TONER_NAZIV AS 'Toner',"
+                + " Toneri.TONER_PREPKOLICINA-Toneri.TONER_KOLICINA AS Količina "
+                + "from TONERI LEFT JOIN PRINTERS ON Printers.TONER=Toneri.TONER_NAZIV WHERE Toneri.TONER_PREPKOLICINA-Toneri.TONER_KOLICINA > 0  GROUP BY Toneri.TONER_NAZIV");
+        Porudzbina_table.setModel(DbUtils.resultSetToTableModel(RsTable));
 
+        Porudzbina_table.setEnabled(false);
+        Porudzbina_table.setRowSelectionAllowed(true);
+        Porudzbina_table.setColumnSelectionAllowed(true);
+        
+       
+
+        
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+    public void openFile(String file){
+        try{
+            File path = new File(file);
+            Desktop.getDesktop().open(path);
+        }
+         catch(IOException ioe ){
+            System.out.println(ioe);
+        }
+    
+    
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -35,7 +101,7 @@ public class Porudzbina extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        Porudzbina_table = new javax.swing.JTable();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
@@ -65,7 +131,7 @@ public class Porudzbina extends javax.swing.JFrame {
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        Porudzbina_table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null},
                 {null, null, null},
@@ -84,10 +150,15 @@ public class Porudzbina extends javax.swing.JFrame {
                 return types [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(Porudzbina_table);
 
         jButton1.setBackground(new java.awt.Color(255, 255, 255));
-        jButton1.setText("Copy");
+        jButton1.setText("Print");
+        jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton1MouseClicked(evt);
+            }
+        });
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -95,10 +166,30 @@ public class Porudzbina extends javax.swing.JFrame {
         });
 
         jButton2.setBackground(new java.awt.Color(255, 255, 255));
-        jButton2.setText("Email");
+        jButton2.setText("Copy");
+        jButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton2MouseClicked(evt);
+            }
+        });
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setBackground(new java.awt.Color(255, 255, 255));
         jButton3.setText("Excel");
+        jButton3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton3MouseClicked(evt);
+            }
+        });
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -315,16 +406,92 @@ public class Porudzbina extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenu8MouseClicked
 
     private void jMenu3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu3MouseClicked
- JOptionPane.showMessageDialog(this,"Program Toneri i Stampaci Pionir d.o.o\n"
+        JOptionPane.showMessageDialog(this,"Program Toneri i Stampaci Pionir d.o.o\n"
                 + "Napravio : Jelic Milos\n"
                 + "Kontakt : 024/660-111");        // TODO add your handling code here:
     }//GEN-LAST:event_jMenu3MouseClicked
+
+    private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
+            //LocalDate vreme = java.time.LocalDate.now();
+          Date today = new Date();
+          DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");  
+          String strDate = dateFormat.format(today);  
+
+     
+          MessageFormat header = new MessageFormat("Porudžbina tonera Pionir d.o.o");
+          MessageFormat footer = new MessageFormat(strDate);
+                      
+            try{
+                Porudzbina_table.print(JTable.PrintMode.NORMAL, header, footer);
+               }catch(Exception e){
+            JOptionPane.showMessageDialog(null,e);
+            }
+    
+    }//GEN-LAST:event_jButton1MouseClicked
+
+    private void jButton3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton3MouseClicked
+       
+    }//GEN-LAST:event_jButton3MouseClicked
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+              try{
+           JFileChooser jFileChooser = new JFileChooser();
+           jFileChooser.showSaveDialog(this);
+           File saveFile = jFileChooser.getSelectedFile();
+           
+           if(saveFile != null){
+               saveFile = new File(saveFile.toString()+".xlsx");
+               Workbook wb = new XSSFWorkbook();
+               Sheet sheet = wb.createSheet("Porudzbina");
+               
+               Row rowCol = sheet.createRow(0);
+               for(int i=0;i<Porudzbina_table.getColumnCount();i++){
+                   Cell cell = rowCol.createCell(i);
+                   cell.setCellValue(Porudzbina_table.getColumnName(i));
+               }
+               
+               for(int j=0;j<Porudzbina_table.getRowCount();j++){
+                   Row row = sheet.createRow(j+1);
+                   for(int k=0;k<Porudzbina_table.getColumnCount();k++){
+                       Cell cell = row.createCell(k);
+                       if(Porudzbina_table.getValueAt(j, k)!=null){
+                           cell.setCellValue(Porudzbina_table.getValueAt(j, k).toString());
+                       }
+                   }
+               }
+               FileOutputStream out = new FileOutputStream(new File(saveFile.toString()));
+               wb.write(out);
+               wb.close();
+               out.close();
+               openFile(saveFile.toString());
+           }else{
+               JOptionPane.showMessageDialog(null,"Greska prilikom exporta");
+           }
+       }catch(FileNotFoundException e){
+           System.out.println(e);
+       }catch(IOException io){
+           System.out.println(io);
+       }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
+        
+          ActionEvent nev = new ActionEvent(Porudzbina_table, ActionEvent.ACTION_PERFORMED, "copy");
+          Porudzbina_table.selectAll();
+          Porudzbina_table.getActionMap().get(nev.getActionCommand()).actionPerformed(nev);
+    }//GEN-LAST:event_jButton2MouseClicked
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton2ActionPerformed
     
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
+      
+
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
@@ -347,7 +514,7 @@ public class Porudzbina extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
-
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -357,6 +524,7 @@ public class Porudzbina extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTable Porudzbina_table;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -377,6 +545,5 @@ public class Porudzbina extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
 }

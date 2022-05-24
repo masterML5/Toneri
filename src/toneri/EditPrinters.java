@@ -586,7 +586,7 @@ public class EditPrinters extends javax.swing.JFrame {
     }//GEN-LAST:event_AddBtnActionPerformed
 
     private void AddBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_AddBtnMouseClicked
-        if( Toner_marka.getText().isEmpty() || Toner_toner.getText().isEmpty() || Toner_model.getText().isEmpty() ||    ID_Toner.getText().isEmpty() ||  Toner_invbroj.getText().isEmpty()){
+        if( Toner_marka.getText().isEmpty() || Toner_toner.getText().isEmpty() || Toner_model.getText().isEmpty() || ID_Toner.getText().isEmpty() ||  Toner_invbroj.getText().isEmpty()){
             JOptionPane.showMessageDialog(this, "Popunite sva polja!");
             
         }
