@@ -150,7 +150,7 @@ public class ZamenaTonera extends javax.swing.JFrame {
             }
         });
 
-        jLabel13.setText("Stampac ID");
+        jLabel13.setText("Štampač ID");
 
         jLabel14.setText("Toner");
 
@@ -158,11 +158,11 @@ public class ZamenaTonera extends javax.swing.JFrame {
 
         Zamena_stampacid.setFont(new java.awt.Font("Open Sans", 1, 12)); // NOI18N
 
-        jLabel15.setText("Kolicina");
+        jLabel15.setText("Količina");
 
         Zamena_kolicina.setFont(new java.awt.Font("Open Sans", 1, 12)); // NOI18N
 
-        jLabel16.setText("Stampac");
+        jLabel16.setText("Štampač");
 
         Zamena_stampac.setFont(new java.awt.Font("Open Sans", 1, 12)); // NOI18N
 
@@ -490,7 +490,7 @@ public class ZamenaTonera extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        // TODO add your handling code here:
+        jTextField1_printer_id1.setText(" ");
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
@@ -568,7 +568,7 @@ public class ZamenaTonera extends javax.swing.JFrame {
                 //Zamena_toner.setText("");
                 //Zamena_kolicina.setText("");
                 //jTextField1_printer_id1.setText("");
-                JOptionPane.showMessageDialog(this,"Toner updated");
+                JOptionPane.showMessageDialog(this,"Uspešno ste skinuli 1 toner sa stanja!");
           
             }catch(SQLException e){
             e.printStackTrace();}
@@ -614,13 +614,9 @@ public class ZamenaTonera extends javax.swing.JFrame {
                 
                 Zamena_kolicina.setText(kolicina.toString());
                 Zamena_kolicina.repaint();
-             //  Zamena_stampacid.setText("");
-              //  Zamena_stampac.setText("");
-              //  Zamena_toner.setText("");
-              //  Zamena_kolicina.setText("");
-              //  jTextField1_printer_id1.setText("");
+         
                 
-                JOptionPane.showMessageDialog(this,"Toner updated");
+                JOptionPane.showMessageDialog(this,"Uspešno ste dodali " + kolicina_vise2 + " tonera!");
                 
             }catch(SQLException e){
             e.printStackTrace();}

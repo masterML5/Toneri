@@ -12,10 +12,13 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import static java.lang.Integer.parseInt;
 import java.sql.Connection;
 import java.util.Date;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.DateFormat;
@@ -27,6 +30,7 @@ import net.proteanit.sql.DbUtils;
 import org.omg.CORBA.Object;
 import javax.swing.JFileChooser;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Header;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -51,6 +55,7 @@ public class Porudzbina extends javax.swing.JFrame {
     Statement St = null;
     ResultSet Rs = null;
     ResultSet RsTable = null;
+    Integer b = 0;
     
  
     
@@ -61,12 +66,16 @@ public class Porudzbina extends javax.swing.JFrame {
         St = Con.createStatement();
         RsTable = St.executeQuery("Select Printers.MARKA as 'Marka', Printers.MODEL as 'Model', Toneri.TONER_NAZIV AS 'Toner',"
                 + " Toneri.TONER_PREPKOLICINA-Toneri.TONER_KOLICINA AS Količina "
-                + "from TONERI LEFT JOIN PRINTERS ON Printers.TONER=Toneri.TONER_NAZIV WHERE Toneri.TONER_PREPKOLICINA-Toneri.TONER_KOLICINA > 0  GROUP BY Toneri.TONER_NAZIV");
+                + "from TONERI LEFT JOIN PRINTERS ON Printers.TONER=Toneri.TONER_NAZIV WHERE Toneri.TONER_PREPKOLICINA-Toneri.TONER_KOLICINA > 0 AND Toneri.TONER_PORUCEN = 'Nije porucen' GROUP BY Toneri.TONER_NAZIV");
         Porudzbina_table.setModel(DbUtils.resultSetToTableModel(RsTable));
 
         Porudzbina_table.setEnabled(false);
         Porudzbina_table.setRowSelectionAllowed(true);
         Porudzbina_table.setColumnSelectionAllowed(true);
+
+        
+       
+         
         
        
 
@@ -85,6 +94,52 @@ public class Porudzbina extends javax.swing.JFrame {
         }
     
     
+    }
+    public void exportExcel(){
+           try{
+           JFileChooser jFileChooser = new JFileChooser();
+           jFileChooser.showSaveDialog(this);
+           File saveFile = jFileChooser.getSelectedFile();
+           
+           if(saveFile != null){
+               saveFile = new File(saveFile.toString()+".xlsx");
+               Workbook wb = new XSSFWorkbook();
+               Sheet sheet = wb.createSheet("Porudzbina");
+               
+               SimpleDateFormat formatter= new SimpleDateFormat("dd-MM-yyyy");
+               java.sql.Date date = new java.sql.Date(System.currentTimeMillis());
+               Header header = sheet.getHeader();  
+               header.setCenter("Pionir d.o.o Porudžbina " + formatter.format(date));  
+               Row rowCol = sheet.createRow(0);
+               for(int i=0;i<Porudzbina_table.getColumnCount();i++){
+                   Cell cell = rowCol.createCell(i);
+                   cell.setCellValue(Porudzbina_table.getColumnName(i));
+               }
+               
+               for(int j=0;j<Porudzbina_table.getRowCount();j++){
+                   Row row = sheet.createRow(j+1);
+                   for(int k=0;k<Porudzbina_table.getColumnCount();k++){
+                       Cell cell = row.createCell(k);
+                       if(Porudzbina_table.getValueAt(j, k)!=null){
+                           cell.setCellValue(Porudzbina_table.getValueAt(j, k).toString());
+                       }
+                   }
+               }
+               FileOutputStream out = new FileOutputStream(new File(saveFile.toString()));
+               wb.write(out);
+               wb.close();
+               out.close();
+               openFile(saveFile.toString());
+           }else{
+               b = 1;
+               JOptionPane.showMessageDialog(null,"Greska prilikom exporta");
+               
+           }
+       }catch(FileNotFoundException e){
+           System.out.println(e);
+       }catch(IOException io){
+           System.out.println(io);
+       }
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -105,6 +160,7 @@ public class Porudzbina extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
@@ -191,31 +247,48 @@ public class Porudzbina extends javax.swing.JFrame {
             }
         });
 
+        jButton4.setText("Poruci sve");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(22, 22, 22)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(131, 131, 131)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 275, Short.MAX_VALUE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(69, 69, 69)
+                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(201, 201, 201)
+                .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(97, 97, 97)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 359, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(23, 23, 23))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(89, 89, 89)
+                        .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -235,7 +308,7 @@ public class Porudzbina extends javax.swing.JFrame {
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(240, 240, 240)
                                 .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 273, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -434,44 +507,7 @@ public class Porudzbina extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3MouseClicked
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-              try{
-           JFileChooser jFileChooser = new JFileChooser();
-           jFileChooser.showSaveDialog(this);
-           File saveFile = jFileChooser.getSelectedFile();
-           
-           if(saveFile != null){
-               saveFile = new File(saveFile.toString()+".xlsx");
-               Workbook wb = new XSSFWorkbook();
-               Sheet sheet = wb.createSheet("Porudzbina");
-               
-               Row rowCol = sheet.createRow(0);
-               for(int i=0;i<Porudzbina_table.getColumnCount();i++){
-                   Cell cell = rowCol.createCell(i);
-                   cell.setCellValue(Porudzbina_table.getColumnName(i));
-               }
-               
-               for(int j=0;j<Porudzbina_table.getRowCount();j++){
-                   Row row = sheet.createRow(j+1);
-                   for(int k=0;k<Porudzbina_table.getColumnCount();k++){
-                       Cell cell = row.createCell(k);
-                       if(Porudzbina_table.getValueAt(j, k)!=null){
-                           cell.setCellValue(Porudzbina_table.getValueAt(j, k).toString());
-                       }
-                   }
-               }
-               FileOutputStream out = new FileOutputStream(new File(saveFile.toString()));
-               wb.write(out);
-               wb.close();
-               out.close();
-               openFile(saveFile.toString());
-           }else{
-               JOptionPane.showMessageDialog(null,"Greska prilikom exporta");
-           }
-       }catch(FileNotFoundException e){
-           System.out.println(e);
-       }catch(IOException io){
-           System.out.println(io);
-       }
+         exportExcel();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
@@ -484,6 +520,70 @@ public class Porudzbina extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        int count = Porudzbina_table.getModel().getRowCount(); 
+        if (count > 0){
+        
+        int respone = JOptionPane.showConfirmDialog(this,"Da li želite da poručite tonere?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+           
+        if(respone == JOptionPane.YES_OPTION){
+       
+        exportExcel();
+        if(b != 1){
+        try{
+        SimpleDateFormat formatter= new SimpleDateFormat("yyyyMMdd");
+        java.sql.Date date = new java.sql.Date(System.currentTimeMillis());
+        final String brojPorudzbine = "DIR-"+formatter.format(date)+"-TP";
+        Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/toneridb","root","");
+        String Query = "Update TONERI set TONER_PORUCEN = 'Porucen' WHERE TONER_PREPKOLICINA-TONER_KOLICINA > 0 AND TONER_PORUCEN = 'Nije porucen'";
+        Statement Add = Con.createStatement();
+        Add.executeUpdate(Query);            
+        
+        
+ 
+        int rows=Porudzbina_table.getRowCount();
+        Class.forName("com.mysql.jdbc.Driver").newInstance();
+        Con.setAutoCommit(false);
+
+        String queryco = "Insert into toneri_porudzbine(PORUDZBINE_TONER,PORUDZBINE_KOLICINA,PORUDZBINE_BROJ,PORUDZBINE_STATUS) values (?,?,?,?)";
+        PreparedStatement pst = Con.prepareStatement(queryco);
+        for(int row = 0; row<rows; row++)
+        {
+
+        String toner = String.valueOf(Porudzbina_table.getValueAt(row, 2));
+        String kolicina2 = String.valueOf(Porudzbina_table.getValueAt(row, 3));
+        String brojpor = brojPorudzbine;
+        
+        Integer kolicina = parseInt(kolicina2);
+
+        pst.setString(1, toner);
+        pst.setInt(2, kolicina);
+        pst.setString(3, brojpor);
+        pst.setString(4, "Porucen");
+        
+
+            pst.addBatch();
+        }
+        pst.executeBatch();
+        Con.commit();
+        SelectPorudzbina();
+        
+        
+        JOptionPane.showMessageDialog(this,"Uspesno ste prebacili status izlistanih tonera na porucen!");
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        }else{
+        JOptionPane.showMessageDialog(this,"Prekid");
+        }
+    
+         }
+        }else{
+        JOptionPane.showMessageDialog(this,"Nema tonera za poručivanje!");
+        }
+    }//GEN-LAST:event_jButton4ActionPerformed
     
     /**
      * @param args the command line arguments
@@ -528,6 +628,7 @@ public class Porudzbina extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
